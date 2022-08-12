@@ -4,14 +4,13 @@ using UnityEngine;
 
 public class TaleGenerator : MonoBehaviour
 {
-    [SerializeField] private int _taleSize;
     [SerializeField] private Segment _segmentTemplate; 
 
-    public List<Segment> Generate()
+    public List<Segment> Generate(int count)
     {
         List<Segment> tail = new List<Segment>();
 
-        for (int i = 0; i < _taleSize; i++)
+        for (int i = 0; i < count; i++)
         {
             tail.Add(Instantiate(_segmentTemplate, transform));
         }

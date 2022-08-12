@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(TaleGenerator))]
 [RequireComponent(typeof(SnakeInput))]
 public class Snake : MonoBehaviour
 {
     [SerializeField] private SnakeHead _head;
+    [SerializeField] private int _taleSize;
     [SerializeField] private float _speed;
     [SerializeField] private float _tailSpringiness;
 
@@ -14,12 +16,27 @@ public class Snake : MonoBehaviour
     private List<Segment> _tail;
     private TaleGenerator _tailGenerator;
 
+    public event UnityAction<int> SizeUpdated;
+
     private void Awake()
     {
         _tailGenerator = GetComponent<TaleGenerator>();
         _input = GetComponent<SnakeInput>();
 
-        _tail = _tailGenerator.Generate();
+        _tail = _tailGenerator.Generate(_taleSize);
+        SizeUpdated?.Invoke(_tail.Count);
+    }
+
+    private void OnEnable()
+    {
+        _head.BlockCollided += OnBlockCollided;
+        _head.BonusCollected += OnBonusCollected;
+    }
+
+    private void OnDisable()
+    {
+        _head.BlockCollided -= OnBlockCollided;
+        _head.BonusCollected -= OnBonusCollected;
     }
 
     private void FixedUpdate()
@@ -41,5 +58,20 @@ public class Snake : MonoBehaviour
 
             _head.Move(nextPosition);
         }
+    }
+
+    private void OnBlockCollided()
+    {
+        Segment deletedSegment = _tail[_tail.Count - 1];
+        _tail.Remove(deletedSegment); 
+        Destroy(deletedSegment.gameObject);
+
+        SizeUpdated?.Invoke(_tail.Count);
+    }
+
+    private void OnBonusCollected(int bonusSize)
+    {
+        _tail.AddRange(_tailGenerator.Generate(bonusSize));
+        SizeUpdated?.Invoke(_tail.Count);
     }
 }
