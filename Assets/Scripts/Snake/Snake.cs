@@ -23,6 +23,10 @@ public class Snake : MonoBehaviour
         _tailGenerator = GetComponent<TaleGenerator>();
         _input = GetComponent<SnakeInput>();
 
+    }
+
+    private void Start()
+    {
         _tail = _tailGenerator.Generate(_taleSize);
         SizeUpdated?.Invoke(_tail.Count);
     }
@@ -55,9 +59,9 @@ public class Snake : MonoBehaviour
             Vector3 tempPosition = segment.transform.position;
             segment.transform.position = Vector2.Lerp(segment.transform.position, previousPosition, _tailSpringiness * Time.deltaTime);
             previousPosition = tempPosition;
-
-            _head.Move(nextPosition);
         }
+
+        _head.Move(nextPosition);
     }
 
     private void OnBlockCollided()
@@ -65,7 +69,6 @@ public class Snake : MonoBehaviour
         Segment deletedSegment = _tail[_tail.Count - 1];
         _tail.Remove(deletedSegment); 
         Destroy(deletedSegment.gameObject);
-
         SizeUpdated?.Invoke(_tail.Count);
     }
 
