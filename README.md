@@ -1,2 +1,2 @@
 # SnakeVSblocs
-Учебный проект
+Training project
